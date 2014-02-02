@@ -16,4 +16,12 @@ sub new {
   });
 };
 
+sub sync {
+  my $class = shift;
+  return {
+    db => $class->new,
+    sync => [@_],
+  };
+}
+
 1;
