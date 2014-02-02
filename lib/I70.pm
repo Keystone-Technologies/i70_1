@@ -8,6 +8,7 @@ sub startup {
   $self->plugin('PQGridCrud');
   $self->plugin('RESTRoutes');
   $self->plugin('I70::Plugin::EMR');
+  $self->app->hook(after_render => sub { ${$_[1]} .= "\n" }); # Append \n to all rendered output.  Handy when using curl.
 
   # Router
   my $r = $self->routes;
