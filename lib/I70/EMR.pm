@@ -9,6 +9,7 @@ sub _time { shift->render(text => scalar localtime) };
 
 sub rest_list {
   my ($self, $table) = @_;
+  $table ||= $self->table;
   my $sth = $self->db->run(fixup => sub {
       my $primary_key = $self->colM->[0]->{dataIndx};
       my $sth = $_->prepare($self->sql->select($table, [\qq{$primary_key AS recId}, map {$_->{dataIndx}} @{$self->colM}]));
@@ -20,6 +21,7 @@ sub rest_list {
 
 sub rest_create {
   my ($self, $table) = @_;
+  $table ||= $self->table;
   $self->db->run(fixup => sub {
       my ($stmt, @bind) = $self->sql->insert($table, {map {$_->{dataIndx} => $self->param($_->{dataIndx}) || undef} @{$self->colM}});
       $_->do($stmt, undef, @bind);
@@ -35,6 +37,8 @@ sub rest_show {
  
 sub rest_remove {
   my ($self, $table, $key) = @_;
+  $table ||= $self->table;
+  $key ||= $self->key;
   $self->db->run(fixup => sub {
       my ($stmt, @bind) = $self->sql->delete($table, {$self->colM->[0]->{dataIndx} => $self->param($key) || undef});
       $_->do($stmt, undef, @bind);
@@ -44,6 +48,8 @@ sub rest_remove {
  
 sub rest_update {
   my ($self, $table, $key) = @_;
+  $table ||= $self->table;
+  $key ||= $self->key;
   $self->db->run(fixup => sub {
       my ($stmt, @bind) = $self->sql->update($table, {map {$_->{dataIndx} => $self->param($_->{dataIndx}) || undef} @{$self->colM}}, {$self->colM->[0]->{dataIndx} => $self->param($key) || undef});
       $_->do($stmt, undef, @bind);
