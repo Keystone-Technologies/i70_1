@@ -9,6 +9,27 @@ sub register {
   for my $module (@{$loader->search(__PACKAGE__)}) {
     $app->plugin($module);
   }
+  $app->helper(j => sub { shift; Mojo::JSON::j(@_) });
+  $app->hook(before_render => sub {
+    my ($self, $args) = @_;
+    # Implement this hook for development mode only 
+    return unless $self->app->mode eq 'development';   
+    # Make sure we are rendering the exception template
+    return unless my $template = $args->{template};
+    if ( $template eq 'exception' ) {
+      # Switch to JSON rendering if content negotiation allows it
+      $args->{json} = {exception => $self->stash('exception')} if scalar $self->req->headers->header('User-Agent') =~ /^curl|^Mojolicious/;
+    } elsif ( $template eq 'not_found' ) {
+      # Switch to JSON rendering if content negotiation allows it
+      $args->{json} = {not_found => $self->stash('not_found')} if scalar $self->req->headers->header('User-Agent') =~ /^curl|^Mojolicious/;
+    }
+  });
+  $app->hook(after_render => sub {
+    my ($self, $args) = @_;
+    # Implement this hook for development mode only 
+    return unless $self->app->mode eq 'development';   
+    $$args .= "\n" if scalar $self->req->headers->header('User-Agent') =~ /^curl|^Mojolicious/;
+  });
 }
 
 1;
