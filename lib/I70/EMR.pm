@@ -106,7 +106,7 @@ __DATA__
     <script type="text/javascript" src="/pqGridCrud.js" ></script>   
     <script>
         $(function () {
-            var colM = <%= content_for 'colM' %>;
+            var colM = <%== j $self->colM =%>;
             var dataModel = {
                 location: "remote",
                 sorting: "local",

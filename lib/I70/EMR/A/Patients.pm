@@ -17,4 +17,3 @@ __DATA__
 @@ patients/index.html.ep
 % layout 'pqgrid', url => "/emr_a/patient";
 % title 'Patients';
-% content_for 'colM' => <%== j $self->colM =%>;
