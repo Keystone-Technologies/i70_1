@@ -1,37 +1,30 @@
 package I70::EMR::A::Patients;
 use Mojo::Base 'I70::EMR::A';
 
-#sub rest_list {
-#  my $self = shift;
-#  $self->render(json => {data => $self->dbh->selectall_arrayref("SELECT * FROM emra_patients patients")});
-#}
+my $colM = [
+  {title=>'ID', width=>190, dataIndx=>'id'},
+  {title=>'Name', width=>160, dataIndx=>'name'},
+  {title=>'SSN', width=>190, dataIndx=>'ssn'},
+  {title=>'DoB', width=>160, dataIndx=>'dob'},
+  {title=>'Nationality', width=>160, dataIndx=>'nationality'},
+];
+has colM => sub { $colM };
 
-sub rest_list { shift->SUPER::rest_list('SELECT * FROM emra_patients patients') }
+sub rest_list { shift->SUPER::rest_list('emra_patients') }
 
-sub rest_create {  
-  my $self = shift;
-  $self->render(text => 'Create: '.scalar localtime);
-}
+sub rest_create { shift->SUPER::rest_create('emra_patients') }
  
 sub rest_show {
   my $self = shift;
-  my ($id) = $self->param('patientsid');
-  $self->render(text => "Show $id: ".scalar localtime);
+  $self->db->run(fixup => sub {
+      $_->do("UPDATE emra_patients ", undef, map { $self->param($_) } (1..4));
+  });
+  $self->rest_list;
 }
  
-sub rest_remove {  
-  my $self = shift;
-  my ($id) = $self->param('patientsid');
-  my $data = $self->dbh; 
-  splice(@$data, $id, 1);
-  $self->render(json => {data => $data});
-}
- 
-sub rest_update {  
-  my $self = shift;
-  my ($id) = $self->param('patientsid');
-  $self->render(text => "Update $id: ".scalar localtime);
-}
+sub rest_remove { shift->SUPER::rest_remove('emra_patients', 'patientsid') }
+
+sub rest_update { shift->SUPER::rest_update('emra_patients', 'patientsid') }
  
 1;
 
@@ -39,10 +32,4 @@ __DATA__
 @@ patients/index.html.ep
 % layout 'pqgrid', url => "/emr_a/patient";
 % title 'Patients';
-% content_for 'colM' => begin
-  { title: "ID", width: 190 },
-  { title: "Name", width: 160 },
-  { title: "SSN", width: 160 },
-  { title: "DoB", width: 190 },
-  { title: "Nationality", width: 190 }
-% end
+% content_for 'colM' => <%== j $self->colM =%>;

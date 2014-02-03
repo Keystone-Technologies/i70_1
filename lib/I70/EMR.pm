@@ -1,22 +1,30 @@
 package I70::EMR;
 use Mojo::Base 'Mojolicious::Controller';
 
+use SQL::Abstract;
+
+has sql => sub { SQL::Abstract->new };
+
 sub _time { shift->render(text => scalar localtime) };
 
 sub rest_list {
-  my $self = shift;
-  my $sql = shift;
+  my ($self, $table) = @_;
   my $sth = $self->db->run(fixup => sub {
-      my $sth = $_->prepare($sql);
+      my $primary_key = $self->colM->[0]->{dataIndx};
+      my $sth = $_->prepare($self->sql->select($table, [\qq{$primary_key AS recId}, map {$_->{dataIndx}} @{$self->colM}]));
       $sth->execute;
       $sth;
   });
-  $self->render(json => {data => $sth->fetchall_arrayref});
+  $self->render(json => {data => $sth->fetchall_arrayref({})});
 }
 
 sub rest_create {
-  my $self = shift;
-  $self->render(text => 'Create: '.scalar localtime);
+  my ($self, $table) = @_;
+  $self->db->run(fixup => sub {
+      my ($stmt, @bind) = $self->sql->insert($table, {map {$_->{dataIndx} => $self->param($_->{dataIndx}) || undef} @{$self->colM}});
+      $_->do($stmt, undef, @bind);
+  });
+  $self->rest_list;
 }
  
 sub rest_show {
@@ -26,17 +34,21 @@ sub rest_show {
 }
  
 sub rest_remove {
-  my $self = shift;
-  my ($id) = $self->param('patientsid');
-  my $data = $self->dbh;
-  splice(@$data, $id, 1);
-  $self->render(json => {data => $data});
+  my ($self, $table, $key) = @_;
+  $self->db->run(fixup => sub {
+      my ($stmt, @bind) = $self->sql->delete($table, {$self->colM->[0]->{dataIndx} => $self->param($key) || undef});
+      $_->do($stmt, undef, @bind);
+  });
+  $self->rest_list;
 }
  
 sub rest_update {
-  my $self = shift;
-  my ($id) = $self->param('patientsid');
-  $self->render(text => "Update $id: ".scalar localtime);
+  my ($self, $table, $key) = @_;
+  $self->db->run(fixup => sub {
+      my ($stmt, @bind) = $self->sql->update($table, {map {$_->{dataIndx} => $self->param($_->{dataIndx}) || undef} @{$self->colM}}, {$self->colM->[0]->{dataIndx} => $self->param($key) || undef});
+      $_->do($stmt, undef, @bind);
+  });
+  $self->rest_list;
 }
  
 sub index {
@@ -88,9 +100,7 @@ __DATA__
     <script type="text/javascript" src="/pqGridCrud.js" ></script>   
     <script>
         $(function () {
-            var colM = [
-                <%= content_for 'colM' %>
-            ];
+            var colM = <%= content_for 'colM' %>;
             var dataModel = {
                 location: "remote",
                 sorting: "local",
@@ -108,6 +118,7 @@ __DATA__
             var newObj = {
                 flexHeight: true,
                 flexWidth: true,
+                customData: {a: "b"},
                 dataModel: dataModel,
                 bottomVisible: true,
                 selectionModel: { mode: 'single' },
