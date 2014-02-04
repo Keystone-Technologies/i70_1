@@ -4,3 +4,4 @@ home="$(dirname $0)/.."
 sudo apt-get install libmysqlclient-dev libssl-dev
 mkdir -p $home/local
 cpanm -L $home/local --installdeps $home
+echo export PERL5LIB=$home/local/lib/perl5
