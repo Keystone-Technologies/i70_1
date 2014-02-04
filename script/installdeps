@@ -1,6 +1,6 @@
 #!/bin/sh
 
-home="$(dirname $0)/.."
+home=$(readlink -f "$(dirname $0)/..")
 sudo apt-get install libmysqlclient-dev libssl-dev
 mkdir -p $home/local
 cpanm -L $home/local --installdeps $home
