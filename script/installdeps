@@ -1,0 +1,5 @@
+#!/bin/sh
+
+home="$(dirname $0)/.."
+mkdir -p $home/local
+cpanm -L $home/local --installdeps $home
