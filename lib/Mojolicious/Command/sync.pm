@@ -14,7 +14,8 @@ has usage => sub { shift->extract_usage };
 
 Hash::Merge::set_behavior('RIGHT_PRECEDENT');
 
-my $couchdb = "http://burfarationsessalindsomm:ECxBSE6eKmui8UwVqSJ42AMR\@s1037989.cloudant.com/i70";
+#my $couchdb = "http://burfarationsessalindsomm:ECxBSE6eKmui8UwVqSJ42AMR\@s1037989.cloudant.com/i70";
+my $couchdb = "http://localhost:5984/i70";
 
 our %dbh;
 

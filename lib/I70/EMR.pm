@@ -143,6 +143,8 @@ __DATA__
     </script>    
   </head>
   <body>
+    <a href="http://couchdb.i70.keystone-tek.com/_utils/database.html?i70">CouchDB</a><br />
+    <a href="<%= url_for 'sync' %>">Sync EMRs -&gt; CouchDB</a><br />
     <div id="grid_crud-remote"></div>
   </body>
 </html>

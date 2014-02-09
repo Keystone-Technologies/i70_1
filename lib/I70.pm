@@ -11,6 +11,7 @@ sub startup {
 
   my $r = $self->routes;
   $r->get('/')->to('example#welcome');
+  $r->get('/sync')->to('example#sync');
 }
 
 1;
