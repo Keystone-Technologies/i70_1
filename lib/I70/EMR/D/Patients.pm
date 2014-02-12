@@ -2,6 +2,7 @@ package I70::EMR::D::Patients;
 use Mojo::Base 'I70::EMR::D';
 
 has table => 'emrd_patients';
+has url => '/emr_d/patient';
 has key => 'patientsid';
 has colM => sub {[
   {title=>'ID', width=>190, dataIndx=>'id'},
@@ -16,5 +17,5 @@ has colM => sub {[
 
 __DATA__
 @@ patients/index.html.ep
-% layout 'pqgrid', url => "/emr_d/patient";
+% layout 'pqgrid';
 % title 'Patients';

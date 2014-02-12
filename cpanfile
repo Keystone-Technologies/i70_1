@@ -1,5 +1,5 @@
 requires 'perl', '5.14.2';
-requires 'Mojolicious', '4.75';
+requires 'Mojolicious', '>=4.50';
 requires 'IO::Socket::IP', '0.20';
 requires 'IO::Socket::SSL', '1.75';
 requires 'EV', '4.0';

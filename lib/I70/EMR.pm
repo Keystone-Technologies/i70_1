@@ -114,7 +114,7 @@ __DATA__
                 dataType: "JSON",
                 method: "GET",
                 //sortIndx: "contact",
-                url: "<%= $url %>",
+                url: "<%= $self->url %>",
                 sortDir: "up",
                 getData: function (dataJSON) {
                     var data = dataJSON.data;
